@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Student Performance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .filename {
+            background: #e8f0fe;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            background: #f0f3ff;
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pass {
+            background: #e3fcef;
+            color: #0b5e42;
+        }
+
+        .badge-fail {
+            background: #fee;
+            color: #b71c1c;
+        }
+
+        .badge-excellent { background: #e3fcef; color: #0b5e42; }
+        .badge-good { background: #e3f2fd; color: #0d47a1; }
+        .badge-average { background: #fff3e0; color: #b26a00; }
+        .badge-poor { background: #fee; color: #b71c1c; }
+
+        .view-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .view-link:hover {
+            text-decoration: underline;
+        }
+
+        .progress {
+            width: 60px;
+            height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📊 Class Dashboard</h1>
+                <span class="filename">{{ filename }}</span>
+            </div>
+            <div class="nav-links">
+                <a href="/download/pdf/{{ session_id }}" class="nav-link">📥 Download PDF</a>
+                <a href="/download/excel/{{ session_id }}" class="nav-link">📥 Download Excel</a>
+                <a href="/clear/{{ session_id }}" class="nav-link">🔄 New Upload</a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ summary.total_students }}</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ summary.pass_count }}</div>
+                <div class="stat-label">Passed ({{ summary.pass_percentage }}%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ summary.fail_count }}</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ summary.avg_percentage }}%</div>
+                <div class="stat-label">Average</div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <img src="data:image/png;base64,{{ chart }}" alt="Performance Chart">
+        </div>
+
+        <!-- Search -->
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by name..." onkeyup="searchTable()">
+
+        <!-- Student Table -->
+        <div class="table-container">
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Sch. No.</th>
+                        <th>Name</th>
+                        <th>Total</th>
+                        <th>Percentage</th>
+                        <th>Category</th>
+                        <th>Result</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.s_no }}</td>
+                        <td>{{ student.sch_no }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.total }}/600</td>
+                        <td>
+                            {{ student.percentage }}%
+                            <div class="progress">
+                                <div class="progress-bar" style="width: {{ student.percentage }}%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if 'Above' in student.category %}badge-excellent
+                                {% elif '60' in student.category %}badge-good
+                                {% elif '50' in student.category %}badge-average
+                                {% else %}badge-poor{% endif %}">
+                                {{ student.category }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if student.result == 'PASS' %}badge-pass{% else %}badge-fail{% endif %}">
+                                {{ student.result }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/student/{{ session_id }}/{{ student.s_no }}" class="view-link">View Details →</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function searchTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('studentTable');
+            const rows = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < rows.length; i++) {
+                const nameCell = rows[i].getElementsByTagName('td')[2];
+                if (nameCell) {
+                    const textValue = nameCell.textContent || nameCell.innerText;
+                    rows[i].style.display = textValue.toUpperCase().indexOf(filter) > -1 ? '' : 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
