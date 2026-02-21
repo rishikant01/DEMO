@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .upload-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f0fe;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .flash-message {
+            padding: 12px;
+            background: #fee;
+            color: #b71c1c;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature span {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📊 Student Performance</h1>
+            <p class="subtitle">Upload Excel file to generate reports</p>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                <div class="upload-area" onclick="document.getElementById('file').click()">
+                    <div class="upload-icon">📁</div>
+                    <p>Click or drag to upload Excel file</p>
+                    <small style="color: #999;">(.xlsx or .xls)</small>
+                </div>
+                
+                <input type="file" name="file" id="file" class="file-input" accept=".xlsx,.xls" required>
+                
+                <div class="file-info" id="fileInfo">
+                    <strong>Selected:</strong> <span id="fileName"></span>
+                </div>
+                
+                <button type="submit" class="btn" id="submitBtn">Upload & Process</button>
+            </form>
+            
+            <div class="features">
+                <div class="feature">
+                    <div>📊</div>
+                    <span>Charts</span>
+                </div>
+                <div class="feature">
+                    <div>📑</div>
+                    <span>PDF</span>
+                </div>
+                <div class="feature">
+                    <div>📈</div>
+                    <span>Analysis</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('file').addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                document.getElementById('fileName').textContent = this.files[0].name;
+                document.getElementById('fileInfo').style.display = 'block';
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Processing...';
+        });
+    </script>
+</body>
+</html>
